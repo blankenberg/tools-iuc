@@ -5,6 +5,7 @@
             <requirement type="package" version="2.5.2">ncbi_vdb</requirement>
             <requirement type="package" version="2.5.2">sra_toolkit</requirement>
             <requirement type="package" version="5.18.1">perl</requirement>
+            <requirement type="package" version="2.5.2">sra_toolkit</requirement>
         </requirements>
     </macro>
     <macro name="input_conditional">
@@ -14,7 +15,7 @@
                 <option value="file">SRA archive in current history</option>
             </param>
             <when value="accession_number">
-                <param name="accession" type="text" label="SRR accession" help="Must start with SRR, e.g. SRR925743"/>
+                <param name="accession" type="text" label="SRR accession" help="Must start with SRR, e.g. SRR925743, or you can use a project ID"/>
             </when>
             <when value="file">
                 <param format="sra" name="file" type="data" label="sra archive"/>
@@ -45,6 +46,43 @@
             <citation type="doi">10.1093/nar/gkq1019</citation>
         </citations>
     </macro>
+    <token name="@FASTQ_DUMP_CMD_OPTIONS@">
+        --defline-seq '@\$sn[_\$rn]/\$ri'
+        --stdout
+        $adv.split
+        #if str( $adv.alignments ) == "aligned":
+            --aligned
+        #end if
+        #if str( $adv.alignments ) == "unaligned":
+            --unaligned
+        #end if
+        #if str( $adv.minID ) != "":
+            --minSpotId "$adv.minID"
+        #end if
+        #if str( $adv.maxID ) != "":
+            --maxSpotId "$adv.maxID"
+        #end if
+        #if str( $adv.minlen ) != "":
+            --minReadLen "$adv.minlen"
+        #end if
+        #if str( $adv.readfilter ) != "":
+            --read-filter "$adv.readfilter"
+        #end if
+        #if str( $adv.region ) != "":
+            --aligned-region "$adv.region"
+        #end if
+        #if str( $adv.spotgroups ) != "":
+            --spot-groups "$adv.spotgroups"
+        #end if
+        #if str( $adv.matepairDist ) != "":
+            --matepair-distance "$adv.matepairDist"
+        #end if
+        $adv.clip
+        $adv.skip_technical
+        #if str( $outputformat ) == "fasta":
+            --fasta
+        #end if
+    </token>
     <token name="@SRATOOLS_ATTRRIBUTION@">Browse the NCBI SRA for SRR accessions at http://www.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=studies.
         Galaxy tool wrapper originally written by Matt Shirley (mdshw5 at gmail.com).
         Tool dependencies, clean-up and bug-fixes by Marius van den Beek (m.vandenbeek at gmail.com).

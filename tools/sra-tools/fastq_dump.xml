@@ -1,4 +1,4 @@
-<tool id="fastq_dump" name="Extract reads" version="1.2.5">
+<tool id="fastq_dump" name="Extract reads" version="1.2.6">
     <description>in FASTQ/A format from NCBI SRA.</description>
     <macros>
         <import>sra_macros.xml</import>
@@ -17,60 +17,42 @@
     vdb-config --restore-defaults &&
     #if $input.input_select == "file":
         fastq-dump --log-level fatal --accession '${input.file.name}'
-    #else:
-        vdb-config -s "/repository/user/main/public/root=\$PWD" &&
-        ## Do not use prefetch if region is specified, to avoid downloading
-        ## the complete sra file.
-        #if ( str( $adv.region ) == "" ) and ( str( $adv.minID ) == "" ) and ( str( $adv.maxID ) == "" ):
-            ASCP_PATH=`command -v ascp` &&
-            ASCP_KEY=`dirname \$ASCP_PATH`/asperaweb_id_dsa.openssh || true &&
-            prefetch --ascp-path "\$ASCP_PATH|\$ASCP_KEY" $input.accession &&
-            ## Duplicate vdb-config, in case settings changed between prefetch and
-            ## dump command.
-            vdb-config -s "/repository/user/main/public/root=\$PWD" &&
-            #end if
-        fastq-dump --accession "$input.accession"
-    #end if
-    --defline-seq '@\$sn[_\$rn]/\$ri'
-    --stdout
-    $adv.split
-    #if str( $adv.alignments ) == "aligned":
-        --aligned
-    #end if
-    #if str( $adv.alignments ) == "unaligned":
-        --unaligned
-    #end if
-    #if str( $adv.minID ) != "":
-        --minSpotId "$adv.minID"
-    #end if
-    #if str( $adv.maxID ) != "":
-        --maxSpotId "$adv.maxID"
-    #end if
-    #if str( $adv.minlen ) != "":
-        --minReadLen "$adv.minlen"
-    #end if
-    #if str( $adv.readfilter ) != "":
-        --read-filter "$adv.readfilter"
-    #end if
-    #if str( $adv.region ) != "":
-        --aligned-region "$adv.region"
-    #end if
-    #if str( $adv.spotgroups ) != "":
-        --spot-groups "$adv.spotgroups"
-    #end if
-    #if str( $adv.matepairDist ) != "":
-        --matepair-distance "$adv.matepairDist"
-    #end if
-    $adv.clip
-    $adv.skip_technical
-    #if str( $outputformat ) == "fasta":
-        --fasta
-    #end if
-    #if $input.input_select=="file":
+        @FASTQ_DUMP_CMD_OPTIONS@
         "$input.file" > "$output_file"
     #else:
-        "$input.accession" > "$output_accession"
+        ##if $input.input_select == "project_accession_number":
+        #if not str( $input.accession ).lower.startswith( "srr" ):
+            accessions="${input.accession}" &&
+        #else:
+            accessions=`esearch -db sra -query "${input.accession}" | efetch --format runinfo | cut -d ',' -f 1 | grep SRR` &&
+            echo \$accessions > "${output_file}" &&
+            mkdir "out" &&
+        #end if
+        for accession in \$accessions; do
+            vdb-config -s "/repository/user/main/public/root=\$PWD" &&
+            ## Do not use prefetch if region is specified, to avoid downloading
+            ## the complete sra file.
+            #if ( str( $adv.region ) == "" ) and ( str( $adv.minID ) == "" ) and ( str( $adv.maxID ) == "" ):
+                ASCP_PATH=`command -v ascp` &&
+                ASCP_KEY=`dirname \$ASCP_PATH`/asperaweb_id_dsa.openssh || true &&
+                prefetch --ascp-path "\$ASCP_PATH|\$ASCP_KEY" $input.accession &&
+                ## Duplicate vdb-config, in case settings changed between prefetch and
+                ## dump command.
+                vdb-config -s "/repository/user/main/public/root=\$PWD" &&
+            #end if
+
+            fastq-dump --accession "\$accession"
+            @FASTQ_DUMP_CMD_OPTIONS@
+            "\$accession"` > 
+            #if not str( $input.accession ).lower.startswith( "srr" ):
+                "${output_accession}"
+            #else:
+                "out/\$accession.${outputformat}"
+            #end if
+            &&
+        done
     #end if
+
     ]]>
     </command>
     <inputs>
@@ -109,6 +91,7 @@
             <filter>input['input_select'] == "accession_number"</filter>
             <change_format>
                 <when input="outputformat" value="fasta" format="fasta"/>
+                <when input="input.input_select" value="project" format="txt"/>
             </change_format>
         </data>
         <data format="fastq" name="output_file" label="${input.file.name}.${outputformat}">
@@ -117,6 +100,10 @@
                 <when input="outputformat" value="fasta" format="fasta"/>
             </change_format>
         </data>
+        <collection name="sequences" type="list">
+            <filter>input['input_select'] == "project"</filter>
+            <discover_datasets pattern="__name__.__ext__" directory="out" />
+        </collection>
     </outputs>
     <tests>
         <test>
