@@ -5,7 +5,11 @@
             <requirement type="package" version="2.5.2">ncbi_vdb</requirement>
             <requirement type="package" version="2.5.2">sra_toolkit</requirement>
             <requirement type="package" version="5.18.1">perl</requirement>
-            <requirement type="package" version="2.5.2">sra_toolkit</requirement>
+<!--
+            <requirement type="package" version="3.72">perl_html_parser</requirement>
+            <requirement type="package" version="6.15">perl_lwp</requirement>
+-->
+            <requirement type="package" version="2016.03.23">entrezdirect</requirement>
         </requirements>
     </macro>
     <macro name="input_conditional">

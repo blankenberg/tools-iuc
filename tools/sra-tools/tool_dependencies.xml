@@ -12,4 +12,15 @@
     <package name="perl" version="5.18.1">
         <repository name="package_perl_5_18" owner="iuc" />
     </package>
+<!--    <package name="perl_html_parser" version="3.72">
+        <repository name="package_perl_html_parser_3_72" owner="iuc" />
+    </package>
+
+    <package name="perl_lwp" version="6.15">
+        <repository name="package_perl_lwp_6_15" owner="iuc" />
+    </package>
+-->
+    <package name="entrezdirect" version="2016.03.23">
+        <repository name="package_entrezdirect_2016_03_23" owner="iuc" />
+    </package>
 </tool_dependency>
