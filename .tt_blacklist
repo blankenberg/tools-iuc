@@ -1,6 +1,5 @@
 tools/art
 tools/bam_to_scidx
-tools/bcftools
 tools/bioperl
 tools/blastxml_to_gapped_gff3
 tools/bwtool
@@ -30,6 +29,5 @@ tools/taxonomy_krona_chart
 tools/tool_factory_2
 tools/transdecoder
 tools/transtermhp
-tools/trinity
 tools/vegan
 tools/xpath
