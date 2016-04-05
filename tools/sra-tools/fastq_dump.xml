@@ -45,7 +45,7 @@
             fastq-dump --accession "\$accession"
             @FASTQ_DUMP_CMD_OPTIONS@
             "\$accession" >
-            #if not str( $input.accession ).lower().startswith( "srr" ):
+            #if str( $input.accession ).lower().startswith( "srr" ):
                 "${output_accession}"
             #else:
                 "out/\$accession.${outputformat}"
@@ -89,11 +89,11 @@
         </section>
     </inputs>
     <outputs>
-        <data format="fastq" name="output_accession" label="${input.accession}.${outputformat}">
+        <data format="txt" name="output_accession" label="${input.accession}.${outputformat}">
             <filter>input['input_select'] == "accession_number"</filter>
             <change_format>
                 <when input="outputformat" value="fasta" format="fasta"/>
-                <when input="input.input_select" value="project" format="txt"/>
+                <when input="outputformat" value="fastqsanger" format="fastqsanger"/>
             </change_format>
         </data>
         <data format="fastq" name="output_file" label="${input.file.name}.${outputformat}">
@@ -103,7 +103,7 @@
             </change_format>
         </data>
         <collection name="sequences" type="list">
-            <filter>input['input_select'] == "project"</filter>
+            <filter>input['input_select'] == "accession_number" and not input['accession'].lower().startswith( "srr" )</filter>
             <discover_datasets pattern="__name__.__ext__" directory="out" />
         </collection>
     </outputs>
