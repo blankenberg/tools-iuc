@@ -8,8 +8,9 @@
 <!--
             <requirement type="package" version="3.72">perl_html_parser</requirement>
             <requirement type="package" version="6.15">perl_lwp</requirement>
--->
             <requirement type="package" version="2016.03.23">entrezdirect</requirement>
+-->
+            <requirement type="package" version="3.90">entrez-direct</requirement>
         </requirements>
     </macro>
     <macro name="input_conditional">
@@ -52,6 +53,7 @@
     </macro>
     <token name="@FASTQ_DUMP_CMD_OPTIONS@">
         --defline-seq '@\$sn[_\$rn]/\$ri'
+        --defline-qual '+'
         --stdout
         $adv.split
         #if str( $adv.alignments ) == "aligned":

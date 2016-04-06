@@ -89,11 +89,12 @@
         </section>
     </inputs>
     <outputs>
-        <data format="txt" name="output_accession" label="${input.accession}.${outputformat}">
+        <data format="fasta" name="output_accession" label="#if ( str( $input.input_select) == 'accession_number' and str( $input.accession ).lower().startswith( 'srr' ) ) then ( str( $input.accession ) + '.' + str( $outputformat ) ) else ( str( $input.accession ) + '.' + str( $outputformat ) + '.txt' )#">
             <filter>input['input_select'] == "accession_number"</filter>
             <change_format>
                 <when input="outputformat" value="fasta" format="fasta"/>
                 <when input="outputformat" value="fastqsanger" format="fastqsanger"/>
+                <when input="${ str($input.accession).lower().startswith( 'srr' ) }" value="False" format="txt"/>
             </change_format>
         </data>
         <data format="fastq" name="output_file" label="${input.file.name}.${outputformat}">
@@ -104,7 +105,7 @@
         </data>
         <collection name="sequences" type="list">
             <filter>input['input_select'] == "accession_number" and not input['accession'].lower().startswith( "srr" )</filter>
-            <discover_datasets pattern="__name__.__ext__" directory="out" />
+            <discover_datasets pattern="__name_and_ext__" directory="out" />
         </collection>
     </outputs>
     <tests>
