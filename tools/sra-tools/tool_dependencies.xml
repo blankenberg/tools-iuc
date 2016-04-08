@@ -19,8 +19,8 @@
     <package name="perl_lwp" version="6.15">
         <repository name="package_perl_lwp_6_15" owner="iuc" />
     </package>
--->
     <package name="entrezdirect" version="2016.03.23">
         <repository name="package_entrezdirect_2016_03_23" owner="iuc" />
     </package>
+-->
 </tool_dependency>
