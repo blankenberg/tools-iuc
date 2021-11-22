@@ -28,15 +28,13 @@ if (is.null(opt$input)) stop("Need --input.")
 if (is.null(opt$model)) stop("Need --model.")
 if (is.null(opt$outDir)) stop("Need --outDir.")
 
-inputName <- tools::file_path_sans_ext(opt$input)
-
 suppressPackageStartupMessages(library(GenomicSuperSignature))
-dat <- as.matrix(read.table(file = opt$input, header = TRUE, sep = "\t", row.names=1))
-RAVmodel <- readRDS(opt$model)
+dat <- as.matrix(read.table(file = opt$input, header = TRUE, sep = "\t", row.names = 1))
+rav_model <- readRDS(opt$model)
 
 
 ### validate -------------------------------------------------------------------
-val_all <- validate(dat, RAVmodel)
+val_all <- validate(dat, rav_model)
 output_fname <- "validate.csv"
 
 write.csv(val_all,
@@ -57,17 +55,17 @@ validated_ind <- validatedSignatures(val_all, num.out = opt$numOut,
                                      swCutoff = 0, indexOnly = TRUE)
 for (i in seq_len(opt$numOut)) {
     set.seed(1)
-    drawWordcloud(RAVmodel, validated_ind[i])
+    drawWordcloud(rav_model, validated_ind[i])
 }
 dev.off()
 
 ### Save tables in csv ---------------------------------------------------------
 # GSEA
 for (i in seq_len(opt$numOut)) {
-    RAVnum <- validated_ind[i]
-    res <- gsea(RAVmodel)[[RAVnum]]
+    rav_num <- validated_ind[i]
+    res <- gsea(rav_model)[[rav_num]]
 
-    output_fname <- paste0("genesets_RAV", RAVnum, ".csv")
+    output_fname <- paste0("genesets_RAV", rav_num, ".csv")
     write.csv(res,
               file = file.path(opt$outDir, output_fname),
               row.names = TRUE)
@@ -75,13 +73,11 @@ for (i in seq_len(opt$numOut)) {
 
 # Related prior studies
 for (i in seq_len(opt$numOut)) {
-    RAVnum <- validated_ind[i]
-    findStudiesInCluster(RAVmodel, RAVnum)
+    rav_num <- validated_ind[i]
+    findStudiesInCluster(rav_model, rav_num)
 
-    output_fname <- paste0("literatures_RAV", RAVnum, ".csv")
+    output_fname <- paste0("literatures_RAV", rav_num, ".csv")
     write.csv(res,
               file = file.path(opt$outDir, output_fname),
               row.names = TRUE)
 }
-
-
